@@ -70,7 +70,7 @@ namespace AzdoProjectTeamMembers.Rest
                     csv.WriteRecords(data);
                 }
             }
-
+            Console.WriteLine("Exported! In Folder:\n"+ System.Environment.CurrentDirectory);
             Console.ReadLine();
         }
     }
