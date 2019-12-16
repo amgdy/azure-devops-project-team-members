@@ -14,14 +14,22 @@ namespace AzdoProjectTeamMembers.Rest
 
         public string ProjectDescription { get; set; }
 
-        public Guid TeamId { get; set; }
+        public string TeamNames {
+            get
+            {
+                return string.Join(";\n", Teams.Select(w => w.TeamName).ToArray());
+            }
+            set { TeamNames = value; }
+        }
 
-        public string TeamName { get; set; }
-
-        public string MemberId { get; set; }
-
-        public string MemberName { get; set; }
-
-        public bool IsTeamAdmin { get; set; }
+        public string TeamMembers
+        {
+            get
+            {
+                return string.Join("\n", Teams.Select(w => w.TeamMembersNames).ToArray());
+            }
+            set { TeamMembers = value; }
+        }
+        public List<Team> Teams { get; set; }
     }
 }
