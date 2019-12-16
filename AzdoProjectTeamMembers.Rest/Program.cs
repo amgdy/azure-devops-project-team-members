@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AzdoProjectTeamMembers.Rest
 {
-    internal class Program
+     internal class Program
     {
         private static async Task Main(string[] args)
         {
@@ -35,33 +35,34 @@ namespace AzdoProjectTeamMembers.Rest
                 {
                     Console.WriteLine(project.Name);
 
-                    var teams = await teamClient.GetTeamsAsync(project.Id.ToString());
+                    var projectTeamMember = new ProjectTeamMember();
 
+                    projectTeamMember.ProjectId = project.Id;
+                    projectTeamMember.ProjectName = project.Name;
+                    projectTeamMember.ProjectDescription = project.Description;
+                    
+                    var teams = await teamClient.GetTeamsAsync(project.Id.ToString());
+                    List<Team> tmmbrs = new List<Team>();
                     foreach (var team in teams)
                     {
 
-                        Console.WriteLine($"\t {team.Name}");
+                        //Console.WriteLine($"\t {team.Name}");
+
+                        //projectTeamMember.TeamId = team.Id;
+                        //projectTeamMember.TeamName = team.Name;
 
                         var members = await teamClient.GetTeamMembersWithExtendedPropertiesAsync(project.Id.ToString(), team.Id.ToString());
+                        List<Member> mmbers = new List<Member>();
 
                         foreach (var member in members)
                         {
                             Console.WriteLine($"\t\t {member.Identity.DisplayName} - {member.IsTeamAdmin}");
-
-                            var projectTeamMember = new ProjectTeamMember
-                            {
-                                ProjectId = project.Id,
-                                ProjectName = project.Name,
-                                TeamId = team.Id,
-                                TeamName = team.Name,
-                                MemberId = member.Identity.Id,
-                                MemberName = member.Identity.DisplayName,
-                                IsTeamAdmin = member.IsTeamAdmin
-                            };
-
-                            data.Add(projectTeamMember);
+                            mmbers.Add(new Member { MemberId  = member.Identity.Id , MemberName = member.Identity.DisplayName, IsTeamAdmin = member.IsTeamAdmin});
                         }
+                        tmmbrs.Add(new Team { TeamId = team.Id, TeamName = team.Name, Members = mmbers });
+                        projectTeamMember.Teams = tmmbrs;
                     }
+                    data.Add(projectTeamMember);
                 }
 
                 using (var writer = new StreamWriter($"data.{DateTime.Now.ToString("yyyyMMddhhmmss")}.csv"))
@@ -70,7 +71,7 @@ namespace AzdoProjectTeamMembers.Rest
                     csv.WriteRecords(data);
                 }
             }
-
+            Console.WriteLine("Exported! In Folder:\n"+ System.Environment.CurrentDirectory);
             Console.ReadLine();
         }
     }
